@@ -15,7 +15,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
       in
       {
-        formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
+        formatter = pkgs.nixpkgs-fmt;
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             bundix
