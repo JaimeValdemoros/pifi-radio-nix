@@ -18,7 +18,7 @@
     in
     {
       packages.default = pkgs.pifi;
-      formatter = pkgs.nixpkgs-fmt;
+      formatter = pkgs.alejandra;
       devShells.default = pkgs.mkShell {
         packages = with pkgs; [
           bundix
