@@ -45,7 +45,7 @@ in {
         ExecStart = "${cfg.package}/bin/pifi --port ${builtins.toString cfg.port}";
       };
       environment = {
-        CONFIG_PATH = let
+        PIFI_CONFIG_PATH = let
           streams = pkgs.writeText "streams.json" (builtins.toJSON cfg.streams);
           config = builtins.toJSON {
             mpd_host = cfg.mpd_host;

@@ -7,7 +7,7 @@ index 0ee269b..2f43176 100644
      include Utils
  
 -    PATH = "/etc/pifi/config.json"
-+    PATH = ENV["CONFIG_PATH"] || "/etc/pifi/config.json"
++    PATH = ENV["PIFI_CONFIG_PATH"] || "/etc/pifi/config.json"
      DEFAULT_KEYS = {
        "mpd_host" => "127.0.0.1",
        "mpd_port" => "6600",
