@@ -26,6 +26,11 @@ let cfg = config.services.pifi; in {
       type = lib.types.str;
       default = "";
     };
+    streams = lib.mkOption {
+      description = "Stream URLs";
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+    };
   };
   config = lib.mkIf cfg.enable {
     systemd.services.pifi = {
@@ -35,14 +40,17 @@ let cfg = config.services.pifi; in {
       };
       wantedBy = [ "multi-user.target" ];
     };
-    environment.etc."pifi/config.json".text = (builtins.toJSON {
+    environment.etc."pifi/config.json".text =
+      let streams = pkgs.writeText "streams.json" (builtins.toJSON cfg.streams);
+      in builtins.toJSON {
         mpd_host = cfg.mpd_host;
         mpd_port = cfg.mpd_port;
         mpd_password = cfg.mpd_pass;
+        streams_path = streams.outPath;
         streams_path_priv = "";
         special_ips = [ ];
         play_local = false;
         serve_static = true;
-    });
+      };
   };
 }
