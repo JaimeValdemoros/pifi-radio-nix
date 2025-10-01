@@ -9,40 +9,39 @@
 
   outputs =
     { self, nixpkgs, flake-utils, ... }:
-    (flake-utils.lib.eachDefaultSystem
-      (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          packages.pifi = pkgs.callPackage ./default.nix { };
-          packages.default = self.packages.${system}.pifi;
-          formatter = pkgs.nixpkgs-fmt;
-          devShells.default = pkgs.mkShell {
-            packages = with pkgs; [
-              bundix
-              ruby
-            ];
-          };
-          overlays.default = final: prev: {
-            inherit (self.packages.${system}) pifi;
-          };
-          nixosModules.default = { pkgs, config, lib, ... }: {
-            imports = [ ./nixos-module.nix ];
-            config = lib.mkIf config.services.pifi.enable {
-              nixpkgs.overlays = [ self.overlays.${system}.default ];
-              services.pifi.package = lib.mkDefault pkgs.pifi;
-            };
-          };
-        }
-      )) // {
+    (flake-utils.lib.eachDefaultSystem (system:
+    let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ self.overlays.default ];
+      };
+    in
+    {
+      packages.default = pkgs.pifi;
+      formatter = pkgs.nixpkgs-fmt;
+      devShells.default = pkgs.mkShell {
+        packages = with pkgs; [
+          bundix
+          ruby
+        ];
+      };
+    }
+    )) // {
+      overlays.default = final: prev: {
+        pifi = final.callPackage ./default.nix { };
+      };
+      nixosModules.default = { pkgs, config, lib, ... }: {
+        imports = [ ./nixos-module.nix ];
+        config = lib.mkIf config.services.pifi.enable {
+          nixpkgs.overlays = [ self.overlays.default ];
+          services.pifi.package = lib.mkDefault pkgs.pifi;
+        };
+      };
       nixosConfigurations.test =
-        let system = "x86_64-linux";
-        in nixpkgs.lib.nixosSystem {
-          inherit system;
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
           modules = [
-            self.nixosModules.${system}.default
+            self.nixosModules.default
             ({ pkgs, lib, ... }: {
               fileSystems."/" = {
                 device = "/dev/sda1";
