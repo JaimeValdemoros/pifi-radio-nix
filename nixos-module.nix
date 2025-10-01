@@ -1,5 +1,11 @@
-{ pkgs, config, lib, ... }:
-let cfg = config.services.pifi; in {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.services.pifi;
+in {
   options.services.pifi = {
     enable = lib.mkEnableOption "pifi";
     package = lib.mkOption {
@@ -29,7 +35,7 @@ let cfg = config.services.pifi; in {
     streams = lib.mkOption {
       description = "Stream URLs";
       type = lib.types.attrsOf lib.types.str;
-      default = { };
+      default = {};
     };
   };
   config = lib.mkIf cfg.enable {
@@ -39,23 +45,22 @@ let cfg = config.services.pifi; in {
         ExecStart = "${cfg.package}/bin/pifi --port ${builtins.toString cfg.port}";
       };
       environment = {
-        CONFIG_PATH =
-          let
-            streams = pkgs.writeText "streams.json" (builtins.toJSON cfg.streams);
-            config = builtins.toJSON {
-              mpd_host = cfg.mpd_host;
-              mpd_port = cfg.mpd_port;
-              mpd_password = cfg.mpd_pass;
-              streams_path = streams.outPath;
-              streams_path_priv = "";
-              special_ips = [ ];
-              play_local = false;
-              serve_static = true;
-            };
-          in
+        CONFIG_PATH = let
+          streams = pkgs.writeText "streams.json" (builtins.toJSON cfg.streams);
+          config = builtins.toJSON {
+            mpd_host = cfg.mpd_host;
+            mpd_port = cfg.mpd_port;
+            mpd_password = cfg.mpd_pass;
+            streams_path = streams.outPath;
+            streams_path_priv = "";
+            special_ips = [];
+            play_local = false;
+            serve_static = true;
+          };
+        in
           (pkgs.writeText "config.json" config).outPath;
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
     };
   };
 }
