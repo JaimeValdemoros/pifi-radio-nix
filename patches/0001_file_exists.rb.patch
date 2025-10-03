@@ -1,0 +1,12 @@
+diff --git a/bin/pifi b/bin/pifi
+index 0b03ffc..77fe445 100755
+--- a/bin/pifi
++++ b/bin/pifi
+@@ -3,6 +3,7 @@
+ # The supported, safe way
+ ENV["APP_ENV"] = "production" if ENV["APP_ENV"].nil?
+ 
++require "file_exists"
+ require "pifi"
+ require "optimist"
+ 

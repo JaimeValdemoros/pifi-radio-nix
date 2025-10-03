@@ -2,7 +2,6 @@
   lib,
   bundlerApp,
   defaultGemConfig,
-  ruby_3_1,
 }:
 bundlerApp {
   pname = "pifi";
@@ -12,12 +11,14 @@ bundlerApp {
     // {
       pifi = attrs: {
         dontBuild = false;
-        patches = [./config_getter.rb.patch];
+        patches = [
+          # Enable PIFI_CONFIG_PATH to set path for config.json
+          ./patches/0000_config_getter.rb.patch
+          # Fix for undefined method `exists?' for class File (NoMethodError) in ruby-mpd
+          # https://idogawa.dev/p/2023/01/file-exists-ruby.html
+          ./patches/0001_file_exists.rb.patch
+        ];
       };
     };
   exes = ["pifi"];
-  # ruby-mpd-0.3.3/lib/ruby-mpd.rb:273:in `socket': undefined method `exists?' for class File (NoMethodError)
-  # `exists?` was removed in ruby 3.2:
-  # https://stackoverflow.com/questions/14351272/undefined-method-exists-for-fileclass-nomethoderror
-  ruby = ruby_3_1;
 }
