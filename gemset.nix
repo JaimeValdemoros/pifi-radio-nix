@@ -19,6 +19,16 @@
     };
     version = "1.2.7";
   };
+  file_exists = {
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "11sh7bfrkssrqbsh49m5pgi952x7j8zc6rya7kidcr9lvvk7k5ml";
+      type = "gem";
+    };
+    version = "0.2.0";
+  };
   json = {
     groups = ["default"];
     platforms = [];
