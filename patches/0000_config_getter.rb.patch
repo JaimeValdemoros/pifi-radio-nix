@@ -1,5 +1,5 @@
 diff --git a/lib/pifi/lib/config_getter.rb b/lib/pifi/lib/config_getter.rb
-index 0ee269b..6d8ee95 100644
+index 0ee269b..26c221e 100644
 --- a/lib/pifi/lib/config_getter.rb
 +++ b/lib/pifi/lib/config_getter.rb
 @@ -4,12 +4,12 @@ module PiFi
@@ -19,3 +19,12 @@ index 0ee269b..6d8ee95 100644
        "streams_path_priv" => "",
        "special_ips" => [],
        "play_local" => false,
+@@ -27,7 +27,7 @@ module PiFi
+         warn "Config found at #{PATH}."
+         config = file_to_hash(PATH)
+       else
+-        warn "Config not found. Using defaults."
++        warn "Config not found at #{PATH}. Using defaults."
+         config = {}
+       end
+       config = DEFAULT_KEYS.merge(config)
