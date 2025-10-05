@@ -3,19 +3,45 @@
   mpd,
   portableService,
   pifi,
-}:
-portableService {
-  pname = "pifi-radio";
-  inherit (pifi) version;
-  units = [
-    (concatText "pifi-radio.service" [./systemd/pifi-radio.service])
-    (concatText "pifi-radio-mpd.service" ["${mpd}/etc/systemd/system/mpd.service"])
-    (concatText "pifi-radio-mpd.socket" ["${mpd}/etc/systemd/system/mpd.socket" ])
-  ];
-  symlinks = [
-    {
-      object = "${pifi}/bin/pifi";
-      symlink = "/bin/pifi";
+  writeText,
+}: let
+  mpd-conf = writeText "mpd.conf" ''
+    audio_output {
+        type            "fifo"
+        name            "snapcast"
+        path            "/tmp/snapfifo/pifi"
+        format          "48000:16:2"
+        mixer_type      "software"
     }
-  ];
-}
+  '';
+in
+  portableService {
+    pname = "pifi-radio";
+    inherit (pifi) version;
+    units = [
+      (concatText "pifi-radio.service" [./systemd/pifi-radio.service])
+      (writeText "pifi-radio-mpd.service" (
+        # Pass config file as part of mpd execution
+        (builtins.replaceStrings ["--systemd"] ["--systemd $CONFIG_FILE"] (
+          builtins.readFile "${mpd}/etc/systemd/system/mpd.service"
+        ))
+        + ''
+          [Service]
+          Environment=CONFIG_FILE=${mpd-conf}
+        ''
+      ))
+      (writeText "pifi-radio-mpd.socket" ''
+        [Socket]
+        ListenStream=%t/pifi-mpd/socket
+
+        [Install]
+        WantedBy=sockets.target
+      '')
+    ];
+    symlinks = [
+      {
+        object = "${pifi}/bin/pifi";
+        symlink = "/bin/pifi";
+      }
+    ];
+  }
