@@ -17,6 +17,8 @@
   pifi-service = writeText "pifi.service" ''
     [Unit]
     Description=pifi web service
+    Requires=pifi-mpd.socket
+    After=pifi-mpd.socket
 
     [Service]
     Environment=PORT=3000
@@ -35,6 +37,9 @@
       builtins.readFile "${mpd}/etc/systemd/system/mpd.service"
     ))
     + ''
+      [Unit]
+      Requires=pifi-mpd.socket
+
       [Service]
       Environment=CONFIG_FILE=${mpd-conf}
     ''
