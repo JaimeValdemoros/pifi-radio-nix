@@ -1,5 +1,4 @@
 {
-  concatText,
   mpd,
   portableService,
   pifi,
