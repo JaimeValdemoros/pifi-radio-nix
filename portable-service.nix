@@ -15,22 +15,22 @@
     }
   '';
   empty-json = writeText "empty.json" (builtins.toJSON {});
-  pifi-radio-service = writeText "pifi-radio.service" ''
+  pifi-service = writeText "pifi.service" ''
     [Unit]
-    Description=pifi-radio web service
+    Description=pifi web service
 
     [Service]
     Environment=PORT=3000
     Environment=PIFI_CONFIG_PATH=${empty-json}
     Environment=PIFI_STREAM_PATH=${empty-json}
-    Environment=PIFI_DEFAULT_MPD_HOST=/run/pifi-radio/mpd.sock
-    BindPaths=/run/pifi-radio
+    Environment=PIFI_DEFAULT_MPD_HOST=/run/pifi/mpd.sock
+    BindPaths=/run/pifi
     ExecStart=${pifi}/bin/pifi --port $PORT
 
     [Install]
     WantedBy=multi-user.target default.target
   '';
-  pifi-radio-mpd-service = writeText "pifi-radio-mpd.service" (
+  pifi-mpd-service = writeText "pifi-mpd.service" (
     # Pass config file as part of mpd execution
     (builtins.replaceStrings ["--systemd"] ["--systemd $CONFIG_FILE"] (
       builtins.readFile "${mpd}/etc/systemd/system/mpd.service"
@@ -40,20 +40,20 @@
       Environment=CONFIG_FILE=${mpd-conf}
     ''
   );
-  pifi-radio-mpd-socket = writeText "pifi-radio-mpd.socket" ''
+  pifi-mpd-socket = writeText "pifi-mpd.socket" ''
     [Socket]
-    ListenStream=%t/pifi-radio/mpd.sock
+    ListenStream=%t/pifi/mpd.sock
 
     [Install]
     WantedBy=sockets.target
   '';
 in
   portableService {
-    pname = "pifi-radio";
+    pname = "pifi";
     inherit (pifi) version;
     units = [
-      pifi-radio-service
-      pifi-radio-mpd-service
-      pifi-radio-mpd-socket
+      pifi-service
+      pifi-mpd-service
+      pifi-mpd-socket
     ];
   }
