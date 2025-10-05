@@ -1,0 +1,9 @@
+[Unit]
+Description=Pifi-radio web service
+
+[Service]
+Environment=PORT=3000
+ExecStart=/bin/pifi --port ${PORT}
+
+[Install]
+WantedBy=multi-user.target default.target
