@@ -1,13 +1,21 @@
 diff --git a/lib/pifi/lib/config_getter.rb b/lib/pifi/lib/config_getter.rb
-index 0ee269b..2f43176 100644
+index 0ee269b..6d8ee95 100644
 --- a/lib/pifi/lib/config_getter.rb
 +++ b/lib/pifi/lib/config_getter.rb
-@@ -4,7 +4,7 @@
+@@ -4,12 +4,12 @@ module PiFi
    class ConfigGetter
      include Utils
  
 -    PATH = "/etc/pifi/config.json"
 +    PATH = ENV["PIFI_CONFIG_PATH"] || "/etc/pifi/config.json"
      DEFAULT_KEYS = {
-       "mpd_host" => "127.0.0.1",
-       "mpd_port" => "6600",
+-      "mpd_host" => "127.0.0.1",
+-      "mpd_port" => "6600",
++      "mpd_host" => (ENV["PIFI_DEFAULT_MPD_HOST"] || "127.0.0.1"),
++      "mpd_port" => (ENV["PIFI_DEFAULT_MPD_PORT"] || "6600"),
+       "mpd_password" => "",
+-      "streams_path" => "/etc/pifi/streams.json",
++      "streams_path" => (ENV["PIFI_STREAM_PATH"] || "/etc/pifi/streams.json"),
+       "streams_path_priv" => "",
+       "special_ips" => [],
+       "play_local" => false,
