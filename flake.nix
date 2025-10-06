@@ -20,7 +20,10 @@
           overlays = [self.overlays.default];
         };
       in {
-        packages.default = pkgs.pifi;
+        packages = {
+          default = self.packages.${system}.pifi;
+          inherit (pkgs) pifi pifi-portable-service;
+        };
         formatter = pkgs.alejandra;
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
@@ -33,6 +36,7 @@
     // {
       overlays.default = final: prev: {
         pifi = final.callPackage ./default.nix {};
+        pifi-portable-service = final.callPackage ./portable-service.nix {};
       };
       nixosModules.default = {
         pkgs,
