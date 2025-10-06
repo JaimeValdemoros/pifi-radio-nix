@@ -4,15 +4,6 @@
   pifi,
   writeText,
 }: let
-  mpd-conf = writeText "mpd.conf" ''
-    audio_output {
-        type            "fifo"
-        name            "snapcast"
-        path            "/tmp/snapfifo/pifi"
-        format          "48000:16:2"
-        mixer_type      "software"
-    }
-  '';
   empty-json = writeText "empty.json" (builtins.toJSON {});
   pifi-service = writeText "pifi.service" ''
     [Unit]
@@ -32,17 +23,10 @@
     WantedBy=multi-user.target default.target
   '';
   pifi-mpd-service = writeText "pifi-mpd.service" (
-    # Pass config file as part of mpd execution
-    (builtins.replaceStrings ["--systemd"] ["--systemd $CONFIG_FILE"] (
+    # Allow specifying mpd.conf location via env var override
+    builtins.replaceStrings ["--systemd"] ["--systemd $CONFIG_FILE"] (
       builtins.readFile "${mpd}/etc/systemd/system/mpd.service"
-    ))
-    + ''
-      [Unit]
-      Requires=pifi-mpd.socket
-
-      [Service]
-      Environment=CONFIG_FILE=${mpd-conf}
-    ''
+    )
   );
   pifi-mpd-socket = writeText "pifi-mpd.socket" ''
     [Socket]
